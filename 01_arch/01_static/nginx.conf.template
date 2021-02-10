@@ -1,0 +1,12 @@
+server {
+  listen 80;
+  listen [::]:80;
+  server_name localhost;
+
+  location / {
+    root /app; # в каком каталоге искать файлы
+    index index.html index.htm; # какие файлы выдавать в качестве индексных (если в качестве ресурса указан каталог)
+    try_files $uri $uri/ /index.html =404; # схема поиска ресурса
+  }
+}
+
