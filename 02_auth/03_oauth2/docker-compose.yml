@@ -1,0 +1,22 @@
+version: '3.7'
+services:
+  client:
+    image: client
+    build: ./client
+    ports:
+      - 9999:9999
+    environment:
+      - AS_URL=http://as:8000
+      - RS_URL=http://rs:8001
+  as:
+    image: as
+    build: ./as
+    ports:
+      - 8000:8000
+  rs:
+    image: rs
+    build: ./rs
+    ports:
+      - 8001:8001
+    environment:
+      - AS_URL=http://as:8000

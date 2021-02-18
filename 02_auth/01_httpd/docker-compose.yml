@@ -1,0 +1,21 @@
+version: '3.7'
+services:
+  apache:
+    image: apache
+    build: .
+    ports:
+      - 8080:80
+    depends_on:
+      - db
+    environment:
+      - APP_DSN=postgres://apache:pass@db:5432/sessions
+  db:
+    image: postgres:13
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=sessions
+      - POSTGRES_USER=apache
+      - POSTGRES_PASSWORD=pass
+    volumes:
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
