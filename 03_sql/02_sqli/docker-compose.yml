@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_USER=app
+      - POSTGRES_DB=db
+    ports:
+      - 5432:5432
+    volumes:
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+  frontend:
+    build: frontend
+    image: sqli-frontend
+    environment:
+      - API=http://backend:9999/
+    ports:
+      - 8888:80
+    depends_on:
+      - backend
+  backend:
+    build: backend
+    image: sqli-backend
+    environment:
+      - DSN=postgres://app:pass@db:5432/db
+    ports:
+      - 9999:9999
+    depends_on:
+      - db

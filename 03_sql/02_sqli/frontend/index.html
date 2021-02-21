@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Список пользователей</title>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <style>
+    </style>
+</head>
+<body>
+<div class="container">
+    <form id="filter" class="row g-1 mt-3 mb-3">
+        <div class="col">
+            <label for="name" class="visually-hidden">Имя</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="Имя">
+        </div>
+        <div class="col-auto">
+            <button type="reset" class="btn btn-danger">Сбросить</button>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-dark">Ok</button>
+        </div>
+    </form>
+    <div id="progress" class="progress invisible">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100"
+             aria-valuemin="100" aria-valuemax="100" style="width: 100%"></div>
+    </div>
+    <div id="alert" class="alert alert-danger invisible" role="alert"></div>
+    <ul id="list" class="list-group invisible"></ul>
+</div>
+<script>
+    const baseURL = '/api/sqli';
+
+    (async () => {
+        const filter = document.querySelector('#filter');
+        const progress = document.querySelector('#progress');
+        const alert = document.querySelector('#alert');
+        const list = document.querySelector('#list');
+        let requestId = 0;
+
+        filter.addEventListener('submit', e => {
+            e.preventDefault();
+            getFiltered((new URLSearchParams(new FormData(e.currentTarget))).toString());
+        });
+        filter.addEventListener('reset', e => {
+            getAll();
+        });
+
+        await getAll();
+
+        async function getAll() {
+            await request(`${baseURL}/getAll`);
+        }
+
+        async function getFiltered(params) {
+            await request(`${baseURL}/getAllByName?${params}`);
+        }
+
+        async function request(url) {
+            const id = ++requestId;
+            list.classList.add('invisible');
+            alert.classList.add('invisible');
+            progress.classList.remove('invisible');
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw Error(response.statusText)
+                }
+                const data = await response.json()
+                if (id === requestId) {
+                    // just ignore xss and other possible stuff
+                    list.innerHTML = data.map(o => `<li class="list-group-item">${o.name}</li>`).join('');
+
+                    list.classList.remove('invisible');
+                    alert.classList.add('invisible');
+                    progress.classList.add('invisible');
+                }
+            } catch (e) {
+                if (id === requestId) {
+                    alert.textContent = e.message;
+
+                    list.classList.add('invisible');
+                    alert.classList.remove('invisible');
+                    progress.classList.add('invisible');
+                }
+            }
+        }
+    })();
+</script>
+</body>
+</html>
