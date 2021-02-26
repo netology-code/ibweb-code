@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+<script>
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        console.log(position);
+        const copy = {
+          accuracy: 11179,
+          altitude: null,
+          altitudeAccuracy: null,
+          heading: null,
+          latitude: 55.7522200,
+          longitude: 37.6155600,
+          speed: null,
+        };
+        copy.__proto__ = GeolocationCoordinates;
+        console.log(copy);
+
+      }, (error) => {
+        console.log(error);
+      },
+    );
+  } else {
+    alert('Please, enable geo in settings');
+  }
+</script>
+</body>
+</html>
